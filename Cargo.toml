@@ -1,0 +1,10 @@
+[package]
+name = "sigmaos_terminal_emulator"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+
+[lib]
+name = "sigmaos_terminal_emulator"
+path = "src/lib.rs"
