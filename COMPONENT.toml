@@ -1,16 +1,16 @@
 [component]
 name = "SigmaOS-terminal-emulator"
 tier = 2
-stability = "scaffold"
+stability = "beta"
 language = "rust"
-description = "No GitHub description is set; component scope remains unclassified."
+description = "VT/ANSI terminal parser, cell grid model, and terminal emulator engine"
 upstream = []
 
 [contract]
-provides = ["component"]
+provides = ["terminal-emulator", "ansi-parser", "grid-model"]
 depends_on = []
 
 [maturity]
-status = "Scaffold"
-test_evidence = "Compiles and passes AAA unit tests"
+status = "Implemented"
+test_evidence = "Compiles and passes 17 unit and integration tests"
 next_milestone = "Hardware and runtime integration"

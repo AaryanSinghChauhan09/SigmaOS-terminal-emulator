@@ -1,29 +1,36 @@
-use sigmaos_component::{Config, Service};
+use sigmaos_component::{Terminal, Grid, EscapeParser, TermAction};
 
 #[test]
-fn config_processes() {
-    assert!(Config::default().process().is_ok());
+fn terminal_grid_round_trip() {
+    // Terminal can be created, written to, and cells read back correctly.
+    let mut t = Terminal::new(24, 80).unwrap();
+    t.write(b"SigmaOS").unwrap();
+    assert_eq!(t.grid.get(0, 0).unwrap().ch, 'S');
+    assert_eq!(t.grid.get(0, 6).unwrap().ch, 'S');
 }
 
 #[test]
-fn service_lifecycle() {
-    let mut s = Service::new(Config::default());
-    assert!(!s.is_running());
-    s.start().unwrap();
-    assert!(s.is_running());
-    s.stop().unwrap();
-    assert!(!s.is_running());
+fn escape_parser_csi_down() {
+    let mut p = EscapeParser::new();
+    let mut last = None;
+    for b in b"\x1b[4B" { last = p.feed(*b); }
+    assert_eq!(last, Some(TermAction::CursorDown(4)));
 }
 
 #[test]
-fn double_start_fails() {
-    let mut s = Service::new(Config::default());
-    s.start().unwrap();
-    assert!(s.start().is_err());
+fn grid_erase_row() {
+    let mut g = Grid::new(5, 10).unwrap();
+    g.set(0, 0, sigmaos_component::Cell {
+        ch: 'Z',
+        attrs: sigmaos_component::Attrs::default(),
+    }).unwrap();
+    g.erase_row(0).unwrap();
+    assert_eq!(g.get(0, 0).unwrap().ch, ' ');
 }
 
 #[test]
-fn stop_when_stopped_fails() {
-    let mut s = Service::new(Config::default());
-    assert!(s.stop().is_err());
+fn terminal_title_via_osc() {
+    let mut t = Terminal::new(10, 40).unwrap();
+    t.write(b"\x1b]0;SigmaOS VT\x07").unwrap();
+    assert_eq!(t.title, "SigmaOS VT");
 }
